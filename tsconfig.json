@@ -30,5 +30,6 @@
     "allowSyntheticDefaultImports": true
   },
   "include": ["server/**/*", "client/**/*"],
+  "types": ["node"],
   "exclude": ["node_modules", "dist", "build", "coverage"]
 }

@@ -223,6 +223,21 @@ Check if code is already formatted:
 npm run format:check
 ```
 
+## Backend Architecture
+
+The backend has been refactored into a layered Express architecture:
+
+- config: environment and application configuration
+- controllers: request handling and response shaping
+- services: application logic
+- repositories: data-access boundary placeholders for future persistence
+- middleware: request logging, validation, and centralized errors
+- routes: route definitions for the current API surface
+- utils: shared helpers and logging
+- types: shared TypeScript interfaces
+
+Requests flow through logging, routing, validation, controllers, services, repositories, and then back to the client. Failures are handled centrally through structured error middleware.
+
 ## Health Check
 
 The backend exposes a health check endpoint that can be used to verify the server is running.
