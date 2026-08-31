@@ -1,0 +1,56 @@
+{
+  "name": "distributed-job-scheduler",
+  "version": "0.0.1",
+  "description": "Distributed Job Scheduler & Async Event Engine",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "server",
+    "worker",
+    "client",
+    "scheduler"
+  ],
+  "scripts": {
+    "dev": "node scripts/start-dev.mjs",
+    "dev:backend": "npm run dev --workspace=server",
+    "worker:dev": "npm run dev --workspace=worker",
+    "scheduler:dev": "npm run dev --workspace=scheduler",
+    "dev:frontend": "npm run dev --workspace=client",
+    "build": "npm run build --workspaces",
+    "build:backend": "npm run build --workspace=server",
+    "build:worker": "npm run build --workspace=worker",
+    "build:scheduler": "npm run build --workspace=scheduler",
+    "build:frontend": "npm run build --workspace=client",
+    "preview": "npm run preview --workspace=client",
+    "prisma:generate": "prisma generate --schema server/prisma/schema.prisma",
+    "benchmark": "node scripts/load-test.mjs",
+    "test": "npm run test --workspaces --if-present",
+    "docker:up": "docker compose -f infra/docker-compose.yml up --build",
+    "docker:down": "docker compose -f infra/docker-compose.yml down",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "npm run typecheck --workspaces",
+    "typecheck:backend": "npm run typecheck --workspace=server",
+    "typecheck:worker": "npm run typecheck --workspace=worker",
+    "typecheck:scheduler": "npm run typecheck --workspace=scheduler",
+    "typecheck:frontend": "npm run typecheck --workspace=client",
+    "postinstall": "npm run prisma:generate"
+  },
+  "devDependencies": {
+    "@eslint/js": "^8.57.0",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "globals": "^15.0.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
