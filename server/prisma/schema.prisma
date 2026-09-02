@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum ExecutionLogStatus {
+  SUCCESS
+  FAILED
+}
+
+model Job {
+  id          String         @id @default(cuid())
+  jobType     String
+  payload     Json
+  status      JobStatus      @default(PENDING)
+  priority    Int            @default(0)
+  scheduledAt DateTime       @default(now()) @db.Timestamptz(6)
+  retryCount  Int            @default(0)
+  maxRetries  Int            @default(3)
+  lastError   String?
+  createdAt   DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime          @updatedAt @db.Timestamptz(6)
+  processingStartedAt DateTime?         @db.Timestamptz(6)
+  idempotencyKey      String?           @unique
+  requestId            String?
+  traceparent         String?
+  tracestate          String?
+  recurringDefinitionId String?
+  executions          ExecutionLog[]
+  recurringDefinition RecurringJob?     @relation(fields: [recurringDefinitionId], references: [id])
+
+  @@index([status])
+  @@index([priority])
+  @@index([scheduledAt])
+  @@map("jobs")
+}
+
+model RecurringJob {
+  id                String   @id @default(cuid())
+  jobType           String
+  payload           Json
+  cronExpression    String
+  timezone          String   @default("UTC")
+  nextRunAt         DateTime @db.Timestamptz(6)
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime @updatedAt @db.Timestamptz(6)
+  executions        Job[]
+
+  @@index([active, nextRunAt])
+  @@map("recurring_jobs")
+}
+
+model ExecutionLog {
+  id          String            @id @default(cuid())
+  jobId       String
+  workerId    String
+  startedAt   DateTime          @db.Timestamptz(6)
+  completedAt DateTime?         @db.Timestamptz(6)
+  durationMs  Int?
+  status      ExecutionLogStatus?
+  error       String?
+  job         Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@index([startedAt])
+  @@map("execution_logs")
+}
