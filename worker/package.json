@@ -1,0 +1,23 @@
+{
+  "name": "worker",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --loader ts-node/esm src/index.ts",
+    "build": "tsc",
+    "start": "node dist/worker/src/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "node --env-file=../.env --loader ts-node/esm --test tests/**/*.test.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.14.0",
+    "ioredis": "^5.4.1",
+    "pino": "^9.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  }
+}

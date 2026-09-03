@@ -1,0 +1,176 @@
+name: CI/CD
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*.*.*']
+  pull_request:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  NODE_VERSION: '20.x'
+  REGISTRY: ghcr.io
+  IMAGE_NAMESPACE: ${{ github.repository_owner }}
+
+jobs:
+  validate:
+    name: Validate, lint, type-check, and unit test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: jobs
+          POSTGRES_USER: jobs
+          POSTGRES_PASSWORD: jobs
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U jobs -d jobs"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npm run prisma:generate
+
+      - name: Apply database migrations
+        run: npx prisma migrate deploy --schema server/prisma/schema.prisma
+        env:
+          DATABASE_URL: postgresql://jobs:jobs@127.0.0.1:5432/jobs?schema=public
+
+      - name: Create CI environment file
+        run: |
+          cat > .env <<'EOF'
+          DATABASE_URL=postgresql://jobs:jobs@127.0.0.1:5432/jobs?schema=public
+          REDIS_URL=redis://127.0.0.1:6379
+          NODE_ENV=test
+          EOF
+          cp .env server/.env
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check workflow formatting
+        run: npx prettier --check .github/workflows/ci.yml
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Run tests
+        run: npm test
+        env:
+          DATABASE_URL: postgresql://jobs:jobs@127.0.0.1:5432/jobs?schema=public
+          REDIS_URL: redis://127.0.0.1:6379
+          NODE_ENV: test
+
+      - name: Dependency audit
+        run: npm audit --omit=dev --audit-level=high
+
+  docker:
+    name: Build and publish ${{ matrix.name }} image
+    needs: validate
+    runs-on: ubuntu-latest
+    if: ${{ needs.validate.result == 'success' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: api
+            dockerfile: Dockerfile.api
+          - name: worker
+            dockerfile: Dockerfile.worker
+          - name: scheduler
+            dockerfile: Dockerfile.scheduler
+          - name: frontend
+            dockerfile: Dockerfile.frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: ${{ github.event_name == 'push' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/pulseq-${{ matrix.name }}
+          tags: |
+            type=sha,format=long
+            type=ref,event=branch
+            type=ref,event=tag
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+
+      - name: Output image information
+        run: |
+          echo "Built image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/pulseq-${{ matrix.name }}"
+          echo "Tags:"
+          printf '%s\n' '${{ steps.meta.outputs.tags }}'
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo 'Image was published to GHCR.'
+          else
+            echo 'Pull request build only; image was not pushed.'
+          fi
+
+  summary:
+    name: CI/CD summary
+    needs: [validate, docker]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report result
+        run: |
+          echo "Validation result: ${{ needs.validate.result }}"
+          echo "Docker result: ${{ needs.docker.result }}"
+          if [ "${{ needs.validate.result }}" != "success" ] || [ "${{ needs.docker.result }}" != "success" ]; then
+            exit 1
+          fi
+          echo 'All required CI/CD stages completed successfully.'
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true

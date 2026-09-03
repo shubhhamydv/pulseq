@@ -1,0 +1,41 @@
+{
+  "environment": {
+    "apiUrl": "http://localhost:3000",
+    "jobs": 2000,
+    "submissionConcurrency": 50,
+    "pollMs": 1000,
+    "timeoutMs": 300000
+  },
+  "measuredAt": "2026-08-13T21:10:02.026Z",
+  "baseline": {
+    "submitted": 0,
+    "pending": 0,
+    "running": 0,
+    "completed": 0,
+    "failed": 0,
+    "cancelled": 0,
+    "retries": 0,
+    "dlqSize": 0,
+    "throughput": 0,
+    "averageExecutionLatencyMs": 0
+  },
+  "results": {
+    "submitted": 2000,
+    "completed": 2000,
+    "failed": 0,
+    "timedOut": false,
+    "duplicateJobs": 0,
+    "duplicateExecutionRate": 0,
+    "failureRate": 0,
+    "submissionThroughputPerSecond": 1162.1150493898895,
+    "completionThroughputPerSecond": 12.940209760800224,
+    "executionDurationMs": {
+      "p50": 6,
+      "p95": 8,
+      "p99": 10,
+      "samples": 2000
+    },
+    "submissionDurationMs": 1721,
+    "completionDurationMs": 154557
+  }
+}

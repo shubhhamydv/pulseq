@@ -1,0 +1,17 @@
+flowchart LR
+  Client[React Dashboard] --> API[Express API]
+  API --> PG[(PostgreSQL / Prisma)]
+  API --> Redis[(Redis)]
+  Scheduler[Recurring Scheduler] --> PG
+  Scheduler --> Redis
+  Redis --> Worker1[Worker 1]
+  Redis --> Worker2[Worker 2]
+  Redis --> WorkerN[Worker N]
+  Worker1 --> PG
+  Worker2 --> PG
+  WorkerN --> PG
+  Worker1 --> Redis
+  Worker2 --> Redis
+  WorkerN --> Redis
+  API -. /metrics + monitoring .-> Prometheus[Prometheus-compatible scraping]
+  Worker1 -. heartbeats .-> Redis

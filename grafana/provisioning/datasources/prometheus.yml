@@ -1,0 +1,14 @@
+apiVersion: 1
+
+datasources:
+  - name: PulseQ Prometheus
+    uid: pulseq-prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      httpMethod: POST
+      manageAlerts: true
+      prometheusType: Prometheus

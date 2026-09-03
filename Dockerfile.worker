@@ -1,0 +1,23 @@
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+COPY server/package*.json server/
+COPY worker/package*.json worker/
+COPY scheduler/package*.json scheduler/
+COPY client/package*.json client/
+RUN npm ci --ignore-scripts
+COPY . .
+RUN npx prisma generate --schema server/prisma/schema.prisma && npm run build:worker
+RUN npm prune --omit=dev
+
+FROM node:20-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+RUN apk add --no-cache tini
+COPY --from=build --chown=node:node /app/node_modules ./node_modules
+COPY --from=build --chown=node:node /app/worker/dist ./worker/dist
+COPY --from=build --chown=node:node /app/server/prisma ./server/prisma
+COPY --from=build --chown=node:node /app/package.json ./package.json
+USER node
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["node", "worker/dist/worker/src/index.js"]

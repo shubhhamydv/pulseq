@@ -1,0 +1,144 @@
+{
+  "project_info": {
+    "title": "Distributed Job Scheduler & Async Event Engine",
+    "created": 1786692557.97,
+    "last_updated": 1786692701.949,
+    "total_slides": 12
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "control_plane",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "architecture",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "lifecycle",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "coordination",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "consistency",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "observability",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "dashboard",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "deployment",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "benchmark",
+      "state": "edited",
+      "pageNum": 10
+    },
+    {
+      "id": "limits",
+      "state": "edited",
+      "pageNum": 11
+    },
+    {
+      "id": "closing",
+      "state": "edited",
+      "pageNum": 12
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "Distributed Job Scheduler & Async Event Engine",
+      "summary": "Architecture, reliability, observability, deployment, and measured performance.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "control_plane",
+      "title": "A control plane for reliable asynchronous work",
+      "summary": "Capabilities and system boundaries of the scheduler platform.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "architecture",
+      "title": "The system separates coordination from execution",
+      "summary": "API, PostgreSQL, Redis, scheduler, and worker pool responsibilities.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "lifecycle",
+      "title": "Every job follows a durable, observable lifecycle",
+      "summary": "Submission through scheduling, execution, retry, and DLQ.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "coordination",
+      "title": "Distributed coordination is built around race-safe claims",
+      "summary": "Worker claims, Redis locks, leases, heartbeats, and priority semantics.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "consistency",
+      "title": "Reliability is honest: effectively-once, not exactly-once",
+      "summary": "Idempotency, retries, DLQ, execution logs, and handler responsibility.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "observability",
+      "title": "Operators get a live view of system health",
+      "summary": "Dashboard, metrics, heartbeats, and structured logging.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "dashboard",
+      "title": "The dashboard follows the operator’s investigation path",
+      "summary": "Overview, jobs, job detail, workers, and metrics views.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "deployment",
+      "title": "Deployment is reproducible and horizontally extensible",
+      "summary": "Docker Compose topology, multi-stage images, health checks, and worker scaling.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "benchmark",
+      "title": "A measured run completed 2,000 jobs without duplicates",
+      "summary": "Verified benchmark setup and measured performance results.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "limits",
+      "title": "What the benchmark demonstrates—and what it does not",
+      "summary": "Evidence, limitations, and next benchmark comparisons.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "closing",
+      "title": "Durable state. Coordinated execution. Honest performance claims.",
+      "summary": "Closing statement for the distributed scheduler portfolio project.",
+      "image_plan": "Use a suitable image if needed"
+    }
+  ]
+}
