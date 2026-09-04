@@ -8,7 +8,7 @@
     "build": "tsc",
     "start": "node dist/worker/src/index.js",
     "typecheck": "tsc --noEmit",
-    "test": "node --env-file=../.env --loader ts-node/esm --test tests/**/*.test.ts"
+    "test": "node --env-file=../.env --loader ts-node/esm --test tests/*.test.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.14.0",

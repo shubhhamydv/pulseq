@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "test": "node --env-file=.env --env-file=../.env --loader ts-node/esm --test --test-concurrency=1 tests/**/*.test.ts",
+    "test": "node --env-file=.env --env-file=../.env --loader ts-node/esm --test --test-concurrency=1 tests/*.test.ts",
     "redis:health": "node --loader ts-node/esm -e \"import('./src/infrastructure/redis/redis.service.js').then(async ({ redisService }) => { console.log(await redisService.ping()); await redisService.disconnect(); })\""
   },
   "dependencies": {
